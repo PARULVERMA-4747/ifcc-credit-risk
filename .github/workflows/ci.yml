@@ -1,0 +1,17 @@
+# Step 20: every push is built, trained, tested and security-scanned before merge
+name: ci
+on: [push, pull_request]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt pip-audit bandit
+      - run: python src/generate_data.py
+      - run: python src/train.py
+      - run: python src/build_app.py
+      - run: pytest -q
+      - run: bandit -q -r src          # static security analysis
+      - run: pip-audit -r requirements.txt   # dependency vulnerability scan

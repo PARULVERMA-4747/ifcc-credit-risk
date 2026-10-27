@@ -1,0 +1,759 @@
+<title>IFCC Underwriting Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a two-pane underwriting desk — application file on the left, decision sheet on the right, model card below */
+:root{
+  --bg:#eef1f4; --panel:#ffffff; --ink:#15202b; --muted:#5b6876; --line:#d5dbe2; --soft:#f5f7f9;
+  --accent:#1d4e89; --accent-soft:#e3ecf7;
+  --ok:#1f7a4d; --ok-soft:#e2f3ea; --warn:#a86a00; --warn-soft:#fbf0db; --bad:#b3261e; --bad-soft:#fbe5e3;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f151c; --panel:#161e27; --ink:#e6ebf0; --muted:#97a3b0; --line:#2a3542; --soft:#1b2530;
+  --accent:#7fb0ec; --accent-soft:#1c2c40;
+  --ok:#5cc48d; --ok-soft:#15301f; --warn:#e3b04f; --warn-soft:#33270f; --bad:#f08a80; --bad-soft:#3a1a18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151c; --panel:#161e27; --ink:#e6ebf0; --muted:#97a3b0; --line:#2a3542; --soft:#1b2530;
+  --accent:#7fb0ec; --accent-soft:#1c2c40;
+  --ok:#5cc48d; --ok-soft:#15301f; --warn:#e3b04f; --warn-soft:#33270f; --bad:#f08a80; --bad-soft:#3a1a18; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--body);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+h1{font:700 28px/1.1 var(--display);margin:0;letter-spacing:.2px;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px}
+.ver{font:500 12px var(--mono);color:var(--muted);text-align:right}
+.ver b{color:var(--ink);font-weight:500}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px;min-width:0}
+h2{font:600 13px var(--display);text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:0 0 12px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+button{font:500 13px var(--body);border:1px solid var(--line);background:var(--soft);color:var(--ink);padding:6px 11px;border-radius:4px;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+fieldset{border:0;padding:0;margin:0 0 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+@media (max-width:460px){fieldset{grid-template-columns:1fr}}
+legend{font:600 12px var(--display);letter-spacing:1px;text-transform:uppercase;color:var(--accent);padding:0 0 6px;grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+input,select{font:500 14px var(--mono);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:7px 8px;width:100%}
+.hint{font-size:11px;color:var(--muted)}
+.derived{display:flex;flex-wrap:wrap;gap:14px;font:12px var(--mono);color:var(--muted);background:var(--soft);padding:8px 10px;border-radius:4px}
+.derived b{color:var(--ink);font-weight:500}
+/* decision sheet */
+.verdict{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.pill{font:700 22px var(--display);letter-spacing:1.5px;padding:6px 16px;border-radius:4px}
+.APPROVE{background:var(--ok-soft);color:var(--ok)} .REFER{background:var(--warn-soft);color:var(--warn)} .DECLINE{background:var(--bad-soft);color:var(--bad)}
+.figs{display:flex;gap:22px;flex-wrap:wrap}
+.fig{display:flex;flex-direction:column}
+.fig span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.fig b{font:600 26px var(--mono);font-variant-numeric:tabular-nums}
+.gauge{margin:18px 0 6px;position:relative;height:58px}
+.band{position:absolute;top:18px;height:14px;left:0;right:0;display:flex;border-radius:2px;overflow:hidden}
+.band div{height:100%}
+.marker{position:absolute;top:6px;width:2px;height:36px;background:var(--ink);transition:left .35s ease}
+.marker::after{content:attr(data-v);position:absolute;top:-4px;left:6px;font:600 12px var(--mono);white-space:nowrap}
+.ticks{position:absolute;top:36px;left:0;right:0;font:11px var(--mono);color:var(--muted)}
+.ticks span{position:absolute;transform:translateX(-50%)}
+.cut{position:absolute;top:14px;height:22px;border-left:1px dashed var(--ink);opacity:.55}
+.sec{margin-top:16px}
+.list{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.list li{display:flex;gap:10px;align-items:baseline;font-size:13px;padding:7px 10px;border-radius:4px;background:var(--soft)}
+.code{font:500 11px var(--mono);color:var(--muted);min-width:84px}
+.none{color:var(--muted);font-size:13px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{font:600 11px var(--display);letter-spacing:.8px;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:6px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+td.n,th.n{text-align:right;font-family:var(--mono)}
+.bar{height:6px;background:var(--accent-soft);border-radius:3px;min-width:60px;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:3px}
+.el{font:12px var(--mono);color:var(--muted);margin-top:10px}
+/* model card */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{background:var(--soft);padding:10px 12px;border-radius:4px}
+.kpi span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.kpi b{font:600 20px var(--mono)}
+.kpi small{color:var(--muted);font-size:11px}
+.cutoff{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:16px}
+@media (max-width:760px){.cutoff{grid-template-columns:1fr}}
+input[type=range]{padding:0;accent-color:var(--accent)}
+.note{font-size:12px;color:var(--muted);max-width:70ch}
+@media (prefers-reduced-motion:reduce){.marker{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>IFCC Bank · Personal Loan Underwriting Desk</h1>
+      <div class="sub">Application scorecard with policy rules, reason codes and expected loss. Synthetic data, no real customers.</div>
+    </div>
+    <div class="ver">model <b id="mv"></b><br>PDO 20 · 600 pts = 50:1 odds</div>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="f" autocomplete="off">
+      <h2>Application file</h2>
+      <div class="presets">
+        <button type="button" data-p="strong">Example: strong salaried</button>
+        <button type="button" data-p="border">Example: borderline</button>
+        <button type="button" data-p="risky">Example: high risk</button>
+        <button type="button" data-p="big">Example: large loan</button>
+      </div>
+      <fieldset><legend>Employment &amp; income</legend>
+        <label>Employment type<select id="employment_type"><option>Salaried</option><option>Self-Employed</option><option>Contract</option><option>Unemployed</option></select></label>
+        <label>Years in job<input id="employment_years" type="number" step="0.5" min="0"></label>
+        <label>Annual income (₹/$)<input id="annual_income" type="number" step="1000" min="0"></label>
+        <label>Home<select id="home_ownership"><option>Own</option><option>Mortgage</option><option>Rent</option></select></label>
+      </fieldset>
+      <fieldset><legend>Credit bureau</legend>
+        <label>Credit history (years)<input id="credit_history_years" type="number" step="0.5" min="0"></label>
+        <label>Utilisation (0–1)<input id="credit_utilization" type="number" step="0.01" min="0" max="1"><span class="hint">0.30 = 30% of limit used</span></label>
+        <label>Enquiries, last 6 m<input id="num_inquiries_6m" type="number" step="1" min="0"></label>
+        <label>Delinquencies, last 2 y<input id="num_delinquencies_2y" type="number" step="1" min="0"></label>
+        <label>Open accounts<input id="num_open_accounts" type="number" step="1" min="0"></label>
+        <label>Existing EMIs / month<input id="existing_monthly_debt" type="number" step="50" min="0"></label>
+      </fieldset>
+      <fieldset><legend>Loan request</legend>
+        <label>Loan amount<input id="loan_amount" type="number" step="500" min="500"></label>
+        <label>Term (months)<select id="loan_term_months"><option>12</option><option>24</option><option>36</option><option>48</option><option>60</option></select></label>
+        <label style="grid-column:1/-1">Purpose<select id="loan_purpose"><option>Debt Consolidation</option><option>Home Improvement</option><option>Medical</option><option>Education</option><option>Wedding</option><option>Travel</option><option>Other</option></select></label>
+      </fieldset>
+      <div class="derived" id="derived"></div>
+    </form>
+
+    <section class="panel" aria-live="polite">
+      <h2>Decision sheet</h2>
+      <div class="verdict">
+        <div class="pill" id="pill">—</div>
+        <div class="figs">
+          <div class="fig"><span>Score</span><b id="score">—</b></div>
+          <div class="fig"><span>Grade</span><b id="grade">—</b></div>
+          <div class="fig"><span>PD 12 m</span><b id="pd">—</b></div>
+        </div>
+      </div>
+      <div class="gauge" id="gauge"></div>
+      <div class="el" id="el"></div>
+
+      <div class="sec"><h2>Policy &amp; fraud rules fired</h2><ul class="list" id="rules"></ul></div>
+      <div class="sec"><h2>Reason codes (adverse action)</h2><ul class="list" id="reasons"></ul></div>
+      <div class="sec"><h2>Decision trace: where every point came from</h2>
+        <div class="tbl"><table><thead><tr><th>Factor</th><th>Value</th><th>Bin</th><th class="n">Points</th><th>of best</th></tr></thead><tbody id="trace"></tbody></table></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Model card · test set of 7,500 applications</h2>
+    <div class="cards" id="kpis"></div>
+    <div class="cutoff">
+      <div>
+        <h2>Try a different approval cutoff</h2>
+        <label>Approve if score ≥ <b id="cv" style="font-family:var(--mono);color:var(--ink)"></b><input id="cut" type="range" min="500" max="610" step="10" value="550"></label>
+        <div class="cards" id="cutk" style="margin-top:10px"></div>
+        <p class="note">Higher cutoff means fewer approvals but safer loans. The credit committee picked 550: it approves about 62% of applicants while the bad rate drops from 10.6% to about 5%.</p>
+      </div>
+      <div class="tbl"><table><thead><tr><th>Grade</th><th class="n">Score from</th><th class="n">Share</th><th class="n">Actual bad rate</th><th></th></tr></thead><tbody id="grades"></tbody></table></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const SC = {
+  "model_version": "ifcc-pl-scorecard-v1.0.0",
+  "factor": 28.85390081777927,
+  "offset": 487.1228762045055,
+  "score_min": 300,
+  "score_max": 900,
+  "grades": [
+    [
+      "A",
+      590
+    ],
+    [
+      "B",
+      570
+    ],
+    [
+      "C",
+      550
+    ],
+    [
+      "D",
+      530
+    ],
+    [
+      "E",
+      300
+    ]
+  ],
+  "approve_cutoff": 550,
+  "refer_cutoff": 530,
+  "lgd": 0.65,
+  "policy": {
+    "min_annual_income": 12000,
+    "max_dti_decline": 0.8,
+    "max_dti_refer": 0.6,
+    "max_delinquencies_refer": 3,
+    "max_loan_amount_auto": 40000,
+    "fraud_inquiries": 6,
+    "fraud_lti": 0.5
+  },
+  "features": {
+    "employment_type": {
+      "type": "categorical",
+      "coef": -0.7687505351442068,
+      "points": {
+        "Contract": 49.26,
+        "Salaried": 59.31,
+        "Self-Employed": 56.74,
+        "Unemployed": 21.64
+      },
+      "neutral_points": 54.86
+    },
+    "employment_years": {
+      "type": "numeric",
+      "coef": -0.33125022665323606,
+      "points": {
+        "[-inf, 1.6)": 50.08,
+        "[1.6, 2.7)": 55.01,
+        "[2.7, 4)": 55.25,
+        "[4, 5.6)": 56.34,
+        "[5.6, 7.9)": 56.65,
+        "[7.9, inf)": 57.0,
+        "__MISSING__": 56.15
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 1.6)",
+          "lower": null,
+          "upper": 1.6,
+          "points": 50.08
+        },
+        {
+          "label": "[1.6, 2.7)",
+          "lower": 1.6,
+          "upper": 2.7,
+          "points": 55.01
+        },
+        {
+          "label": "[2.7, 4)",
+          "lower": 2.7,
+          "upper": 4.0,
+          "points": 55.25
+        },
+        {
+          "label": "[4, 5.6)",
+          "lower": 4.0,
+          "upper": 5.6,
+          "points": 56.34
+        },
+        {
+          "label": "[5.6, 7.9)",
+          "lower": 5.6,
+          "upper": 7.9,
+          "points": 56.65
+        },
+        {
+          "label": "[7.9, inf)",
+          "lower": 7.9,
+          "upper": null,
+          "points": 57.0
+        }
+      ],
+      "missing_points": 56.15
+    },
+    "annual_income": {
+      "type": "numeric",
+      "coef": -0.5458167782537189,
+      "points": {
+        "[-inf, 3.28e+04)": 44.95,
+        "[3.28e+04, 4.35e+04)": 53.35,
+        "[4.35e+04, 5.38e+04)": 57.37,
+        "[5.38e+04, 8.52e+04)": 58.3,
+        "[8.52e+04, inf)": 61.11
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 3.28e+04)",
+          "lower": null,
+          "upper": 32800.0,
+          "points": 44.95
+        },
+        {
+          "label": "[3.28e+04, 4.35e+04)",
+          "lower": 32800.0,
+          "upper": 43500.0,
+          "points": 53.35
+        },
+        {
+          "label": "[4.35e+04, 5.38e+04)",
+          "lower": 43500.0,
+          "upper": 53800.0,
+          "points": 57.37
+        },
+        {
+          "label": "[5.38e+04, 8.52e+04)",
+          "lower": 53800.0,
+          "upper": 85200.0,
+          "points": 58.3
+        },
+        {
+          "label": "[8.52e+04, inf)",
+          "lower": 85200.0,
+          "upper": null,
+          "points": 61.11
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "credit_history_years": {
+      "type": "numeric",
+      "coef": -1.1009949626617053,
+      "points": {
+        "[-inf, 3.6)": 43.21,
+        "[12, 16)": 57.42,
+        "[16, 20.4)": 64.71,
+        "[20.4, inf)": 71.21,
+        "[3.6, 8)": 46.2,
+        "[8, 12)": 53.0
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 3.6)",
+          "lower": null,
+          "upper": 3.6,
+          "points": 43.21
+        },
+        {
+          "label": "[3.6, 8)",
+          "lower": 3.6,
+          "upper": 8.0,
+          "points": 46.2
+        },
+        {
+          "label": "[8, 12)",
+          "lower": 8.0,
+          "upper": 12.0,
+          "points": 53.0
+        },
+        {
+          "label": "[12, 16)",
+          "lower": 12.0,
+          "upper": 16.0,
+          "points": 57.42
+        },
+        {
+          "label": "[16, 20.4)",
+          "lower": 16.0,
+          "upper": 20.4,
+          "points": 64.71
+        },
+        {
+          "label": "[20.4, inf)",
+          "lower": 20.4,
+          "upper": null,
+          "points": 71.21
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "credit_utilization": {
+      "type": "numeric",
+      "coef": -1.1102837120144504,
+      "points": {
+        "[-inf, 0.188)": 73.17,
+        "[0.188, 0.381)": 62.83,
+        "[0.381, 0.481)": 54.21,
+        "[0.481, 0.607)": 46.65,
+        "[0.607, inf)": 38.16,
+        "__MISSING__": 62.11
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 0.188)",
+          "lower": null,
+          "upper": 0.188,
+          "points": 73.17
+        },
+        {
+          "label": "[0.188, 0.381)",
+          "lower": 0.188,
+          "upper": 0.381,
+          "points": 62.83
+        },
+        {
+          "label": "[0.381, 0.481)",
+          "lower": 0.381,
+          "upper": 0.481,
+          "points": 54.21
+        },
+        {
+          "label": "[0.481, 0.607)",
+          "lower": 0.481,
+          "upper": 0.607,
+          "points": 46.65
+        },
+        {
+          "label": "[0.607, inf)",
+          "lower": 0.607,
+          "upper": null,
+          "points": 38.16
+        }
+      ],
+      "missing_points": 62.11
+    },
+    "num_inquiries_6m": {
+      "type": "numeric",
+      "coef": -1.1321315234194496,
+      "points": {
+        "[-inf, 1)": 62.23,
+        "[1, 2)": 57.02,
+        "[2, inf)": 47.0
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 1)",
+          "lower": null,
+          "upper": 1.0,
+          "points": 62.23
+        },
+        {
+          "label": "[1, 2)",
+          "lower": 1.0,
+          "upper": 2.0,
+          "points": 57.02
+        },
+        {
+          "label": "[2, inf)",
+          "lower": 2.0,
+          "upper": null,
+          "points": 47.0
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "num_delinquencies_2y": {
+      "type": "numeric",
+      "coef": -1.068446810655401,
+      "points": {
+        "[-inf, 1)": 61.11,
+        "[1, inf)": 42.91
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 1)",
+          "lower": null,
+          "upper": 1.0,
+          "points": 61.11
+        },
+        {
+          "label": "[1, inf)",
+          "lower": 1.0,
+          "upper": null,
+          "points": 42.91
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "loan_term_months": {
+      "type": "numeric",
+      "coef": -0.07495764684903747,
+      "points": {
+        "[-inf, 24)": 54.04,
+        "[24, 36)": 54.8,
+        "[36, 48)": 54.94,
+        "[48, inf)": 55.08
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 24)",
+          "lower": null,
+          "upper": 24.0,
+          "points": 54.04
+        },
+        {
+          "label": "[24, 36)",
+          "lower": 24.0,
+          "upper": 36.0,
+          "points": 54.8
+        },
+        {
+          "label": "[36, 48)",
+          "lower": 36.0,
+          "upper": 48.0,
+          "points": 54.94
+        },
+        {
+          "label": "[48, inf)",
+          "lower": 48.0,
+          "upper": null,
+          "points": 55.08
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "dti": {
+      "type": "numeric",
+      "coef": -0.977945032960191,
+      "points": {
+        "[-inf, 0.229)": 73.25,
+        "[0.229, 0.305)": 65.33,
+        "[0.305, 0.377)": 60.66,
+        "[0.377, 0.457)": 57.01,
+        "[0.457, 0.572)": 48.82,
+        "[0.572, inf)": 36.31
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 0.229)",
+          "lower": null,
+          "upper": 0.229,
+          "points": 73.25
+        },
+        {
+          "label": "[0.229, 0.305)",
+          "lower": 0.229,
+          "upper": 0.305,
+          "points": 65.33
+        },
+        {
+          "label": "[0.305, 0.377)",
+          "lower": 0.305,
+          "upper": 0.377,
+          "points": 60.66
+        },
+        {
+          "label": "[0.377, 0.457)",
+          "lower": 0.377,
+          "upper": 0.457,
+          "points": 57.01
+        },
+        {
+          "label": "[0.457, 0.572)",
+          "lower": 0.457,
+          "upper": 0.572,
+          "points": 48.82
+        },
+        {
+          "label": "[0.572, inf)",
+          "lower": 0.572,
+          "upper": null,
+          "points": 36.31
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "loan_to_income": {
+      "type": "numeric",
+      "coef": -0.5104186205612955,
+      "points": {
+        "[-inf, 0.142)": 60.4,
+        "[0.142, 0.232)": 58.22,
+        "[0.232, 0.321)": 57.68,
+        "[0.321, 0.408)": 55.01,
+        "[0.408, 0.499)": 51.3,
+        "[0.499, inf)": 49.18
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 0.142)",
+          "lower": null,
+          "upper": 0.142,
+          "points": 60.4
+        },
+        {
+          "label": "[0.142, 0.232)",
+          "lower": 0.142,
+          "upper": 0.232,
+          "points": 58.22
+        },
+        {
+          "label": "[0.232, 0.321)",
+          "lower": 0.232,
+          "upper": 0.321,
+          "points": 57.68
+        },
+        {
+          "label": "[0.321, 0.408)",
+          "lower": 0.321,
+          "upper": 0.408,
+          "points": 55.01
+        },
+        {
+          "label": "[0.408, 0.499)",
+          "lower": 0.408,
+          "upper": 0.499,
+          "points": 51.3
+        },
+        {
+          "label": "[0.499, inf)",
+          "lower": 0.499,
+          "upper": null,
+          "points": 49.18
+        }
+      ],
+      "missing_points": 54.86
+    }
+  }
+};
+const META = {
+  "model_version": "ifcc-pl-scorecard-v1.0.0",
+  "trained_at_utc": "2026-10-27T08:38:38.831061+00:00",
+  "data_sha256_16": "5853f88814c9530e",
+  "seed": 42,
+  "n_train": 17500,
+  "n_test": 7500,
+  "selected_features": [
+    "employment_type",
+    "employment_years",
+    "annual_income",
+    "credit_history_years",
+    "credit_utilization",
+    "num_inquiries_6m",
+    "num_delinquencies_2y",
+    "loan_term_months",
+    "dti",
+    "loan_to_income"
+  ],
+  "excluded_features": [
+    "age"
+  ],
+  "scaling": {
+    "pdo": 20,
+    "base_score": 600,
+    "base_odds": 50,
+    "factor": 28.85390081777927,
+    "offset": 487.1228762045055
+  },
+  "metrics": {
+    "champion_lr_woe": {
+      "train": {
+        "auc": 0.7393,
+        "gini": 0.4787,
+        "ks": 0.3582,
+        "log_loss": 0.3003,
+        "brier": 0.086
+      },
+      "test": {
+        "auc": 0.7429,
+        "gini": 0.4858,
+        "ks": 0.3639,
+        "log_loss": 0.3008,
+        "brier": 0.0867
+      }
+    },
+    "challenger_gbm": {
+      "test": {
+        "auc": 0.7302,
+        "gini": 0.4604,
+        "ks": 0.3538,
+        "log_loss": 0.3029,
+        "brier": 0.0865
+      }
+    },
+    "psi_train_vs_test": 0.0028,
+    "portfolio_test": {
+      "total_ead": 140425900.0,
+      "total_el": 9642356.0,
+      "el_rate": 0.0687
+    }
+  }
+};
+const CUTS = [{"cutoff": 500, "approval_rate": 0.9771, "bad_rate_approved": 0.0992, "expected_loss_approved": 9108936.0, "actual_loss_approved": 9162140.0, "el_pct_of_book": 0.0657}, {"cutoff": 510, "approval_rate": 0.9539, "bad_rate_approved": 0.093, "expected_loss_approved": 8448096.0, "actual_loss_approved": 8532550.0, "el_pct_of_book": 0.0622}, {"cutoff": 520, "approval_rate": 0.9139, "bad_rate_approved": 0.0837, "expected_loss_approved": 7553222.0, "actual_loss_approved": 7523295.0, "el_pct_of_book": 0.0578}, {"cutoff": 530, "approval_rate": 0.8479, "bad_rate_approved": 0.0745, "expected_loss_approved": 6231203.0, "actual_loss_approved": 6273670.0, "el_pct_of_book": 0.0515}, {"cutoff": 540, "approval_rate": 0.7475, "bad_rate_approved": 0.0642, "expected_loss_approved": 4672766.0, "actual_loss_approved": 4724200.0, "el_pct_of_book": 0.0441}, {"cutoff": 550, "approval_rate": 0.6183, "bad_rate_approved": 0.0515, "expected_loss_approved": 3120724.0, "actual_loss_approved": 3077490.0, "el_pct_of_book": 0.0363}, {"cutoff": 560, "approval_rate": 0.4631, "bad_rate_approved": 0.0392, "expected_loss_approved": 1814880.0, "actual_loss_approved": 1754805.0, "el_pct_of_book": 0.0289}, {"cutoff": 570, "approval_rate": 0.3192, "bad_rate_approved": 0.0301, "expected_loss_approved": 968832.0, "actual_loss_approved": 1024725.0, "el_pct_of_book": 0.0229}, {"cutoff": 580, "approval_rate": 0.1863, "bad_rate_approved": 0.0229, "expected_loss_approved": 424512.0, "actual_loss_approved": 471640.0, "el_pct_of_book": 0.0176}, {"cutoff": 590, "approval_rate": 0.0943, "bad_rate_approved": 0.0226, "expected_loss_approved": 155804.0, "actual_loss_approved": 264875.0, "el_pct_of_book": 0.0134}, {"cutoff": 600, "approval_rate": 0.0376, "bad_rate_approved": 0.0177, "expected_loss_approved": 44529.0, "actual_loss_approved": 74620.0, "el_pct_of_book": 0.0102}, {"cutoff": 610, "approval_rate": 0.0111, "bad_rate_approved": 0.012, "expected_loss_approved": 9624.0, "actual_loss_approved": 32500.0, "el_pct_of_book": 0.0077}];
+const GRADES = [{"grade": "A", "n": 707, "share": 0.0943, "avg_pd": 0.0205, "bad_rate": 0.0226, "min_score": 590.013, "max_score": 630.2594}, {"grade": "B", "n": 1687, "share": 0.2249, "avg_pd": 0.0406, "bad_rate": 0.0332, "min_score": 570.0122, "max_score": 589.9997}, {"grade": "C", "n": 2243, "share": 0.2991, "avg_pd": 0.0754, "bad_rate": 0.0745, "min_score": 550.0, "max_score": 569.9736}, {"grade": "D", "n": 1722, "share": 0.2296, "avg_pd": 0.1366, "bad_rate": 0.1365, "min_score": 530.0046, "max_score": 549.9967}, {"grade": "E", "n": 1141, "share": 0.1521, "avg_pd": 0.2914, "bad_rate": 0.2831, "min_score": 443.4708, "max_score": 529.9913}];
+const REASON = {dti:"Debt-to-income ratio is high",employment_type:"Employment type indicates less stable income",credit_utilization:"Revolving credit utilisation is high",annual_income:"Annual income is low relative to other applicants",credit_history_years:"Length of credit history is short",num_delinquencies_2y:"Recent delinquencies on credit file",loan_to_income:"Requested loan is large relative to income",employment_years:"Time in current employment is short",num_inquiries_6m:"Several recent credit enquiries",loan_term_months:"Requested loan term is long"};
+const LABEL = {dti:"Debt-to-income",employment_type:"Employment type",credit_utilization:"Utilisation",annual_income:"Annual income",credit_history_years:"Credit history",num_delinquencies_2y:"Delinquencies 2y",loan_to_income:"Loan-to-income",employment_years:"Years in job",num_inquiries_6m:"Enquiries 6m",loan_term_months:"Loan term"};
+const PRESETS = {
+ strong:{employment_type:"Salaried",employment_years:8,annual_income:95000,home_ownership:"Own",credit_history_years:15,credit_utilization:0.10,num_inquiries_6m:0,num_delinquencies_2y:0,num_open_accounts:4,existing_monthly_debt:300,loan_amount:8000,loan_term_months:24,loan_purpose:"Home Improvement"},
+ border:{employment_type:"Salaried",employment_years:2,annual_income:45000,home_ownership:"Rent",credit_history_years:5,credit_utilization:0.70,num_inquiries_6m:2,num_delinquencies_2y:0,num_open_accounts:4,existing_monthly_debt:650,loan_amount:12000,loan_term_months:48,loan_purpose:"Debt Consolidation"},
+ risky:{employment_type:"Contract",employment_years:1,annual_income:30000,home_ownership:"Rent",credit_history_years:2,credit_utilization:0.85,num_inquiries_6m:4,num_delinquencies_2y:2,num_open_accounts:5,existing_monthly_debt:700,loan_amount:10000,loan_term_months:60,loan_purpose:"Travel"},
+ big:{employment_type:"Salaried",employment_years:10,annual_income:200000,home_ownership:"Mortgage",credit_history_years:18,credit_utilization:0.15,num_inquiries_6m:1,num_delinquencies_2y:0,num_open_accounts:5,existing_monthly_debt:900,loan_amount:45000,loan_term_months:48,loan_purpose:"Education"}
+};
+const NUM = ["employment_years","annual_income","credit_history_years","credit_utilization","num_inquiries_6m","num_delinquencies_2y","num_open_accounts","existing_monthly_debt","loan_amount","loan_term_months"];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = n => Number(n).toLocaleString("en-IN",{maximumFractionDigits:0});
+
+function read(){const a={};for(const k of Object.keys(PRESETS.strong)){const v=$(k).value;a[k]=NUM.includes(k)?(v===""?null:Number(v)):v}return a}
+function fill(p){for(const [k,v] of Object.entries(p))$(k).value=v;run()}
+
+function derive(a){const r=0.14/12, n=a.loan_term_months||36, amt=a.loan_amount||0, inc=Math.max(a.annual_income||0,1);
+  const emi=amt*r/(1-Math.pow(1+r,-n));
+  return {...a,new_emi:emi,dti:Math.round(Math.min(((a.existing_monthly_debt||0)+emi)/(inc/12),2)*1000)/1000,loan_to_income:Math.round(amt/inc*1000)/1000}}
+function pts(f,v){const s=SC.features[f];
+  if(v===null||v===undefined||Number.isNaN(v))return [s.missing_points??s.neutral_points,"missing"];
+  if(s.type==="categorical")return [s.points[String(v)]??s.neutral_points,String(v)];
+  for(const b of s.bins){const lo=b.lower??-Infinity, hi=b.upper??Infinity; if(v>=lo&&v<hi)return [b.points,b.label.replace("-inf","−∞").replace("inf","∞")]}
+  return [s.neutral_points,"out of range"]}
+function gradeOf(s){for(const [g,lb] of SC.grades)if(s>=lb)return g;return "E"}
+
+function score(app){
+  const a=derive(app); let tot=0; const trace=[];
+  for(const [f,s] of Object.entries(SC.features)){const [p,bin]=pts(f,a[f]);const best=Math.max(...Object.values(s.points));
+    trace.push({f,v:a[f],bin,p,best,lost:best-p});tot+=p}
+  const sc=Math.max(SC.score_min,Math.min(SC.score_max,tot));
+  const pd=1/(1+Math.exp((sc-SC.offset)/SC.factor));
+  const P=SC.policy, rules=[];
+  if(a.annual_income<P.min_annual_income)rules.push(["DECLINE","POL-01","Annual income below policy minimum"]);
+  if(a.dti>P.max_dti_decline)rules.push(["DECLINE","POL-02","Debt-to-income above policy maximum (80%)"]);
+  else if(a.dti>P.max_dti_refer)rules.push(["REFER","POL-03","Debt-to-income in referral zone (60–80%)"]);
+  if(a.num_delinquencies_2y>=P.max_delinquencies_refer)rules.push(["REFER","POL-04","Multiple recent delinquencies"]);
+  if(a.loan_amount>P.max_loan_amount_auto)rules.push(["REFER","POL-05","Loan amount above auto-approval limit (40,000)"]);
+  if(a.num_inquiries_6m>=P.fraud_inquiries&&a.loan_to_income>P.fraud_lti)rules.push(["REFER","FRD-01","Fraud signal: many enquiries with high loan-to-income"]);
+  const md=sc>=SC.approve_cutoff?"APPROVE":sc>=SC.refer_cutoff?"REFER":"DECLINE";
+  const acts=rules.map(r=>r[0]).concat(md);
+  const dec=acts.includes("DECLINE")?"DECLINE":acts.includes("REFER")?"REFER":"APPROVE";
+  const reasons=trace.filter(t=>t.lost>0.5).sort((x,y)=>y.lost-x.lost).slice(0,4);
+  return {a,sc,pd,grade:gradeOf(sc),dec,md,rules,reasons,trace,el:pd*SC.lgd*a.loan_amount}}
+
+const GMIN=450,GMAX=650, pos=v=>Math.max(0,Math.min(100,(v-GMIN)/(GMAX-GMIN)*100));
+function gauge(sc){
+  const bands=[[GMIN,SC.refer_cutoff,"var(--bad)"],[SC.refer_cutoff,SC.approve_cutoff,"var(--warn)"],[SC.approve_cutoff,GMAX,"var(--ok)"]];
+  let h='<div class="band">'+bands.map(b=>`<div style="width:${pos(b[1])-pos(b[0])}%;background:${b[2]};opacity:.75"></div>`).join("")+'</div>';
+  h+='<div class="ticks">'+[450,500,530,550,600,650].map(t=>`<span style="left:${pos(t)}%">${t}</span>`).join("")+'</div>';
+  h+=`<div class="marker" style="left:calc(${pos(sc)}% - 1px)" data-v="${sc.toFixed(0)}"></div>`;
+  $("gauge").innerHTML=h}
+
+function run(){
+  const r=score(read());
+  $("pill").textContent=r.dec; $("pill").className="pill "+r.dec;
+  $("score").textContent=r.sc.toFixed(0); $("grade").textContent=r.grade; $("pd").textContent=(r.pd*100).toFixed(1)+"%";
+  gauge(r.sc);
+  $("el").textContent=`Expected loss = PD ${(r.pd*100).toFixed(2)}% × LGD ${SC.lgd*100}% × EAD ${fmt(r.a.loan_amount)} = ${fmt(r.el)}`+(r.md!==r.dec?`   ·   model alone said ${r.md}`:"");
+  $("derived").innerHTML=`New EMI <b>${fmt(r.a.new_emi)}</b> · DTI <b>${(r.a.dti*100).toFixed(1)}%</b> · Loan/Income <b>${(r.a.loan_to_income*100).toFixed(1)}%</b>`;
+  $("rules").innerHTML=r.rules.length?r.rules.map(x=>`<li><span class="code">${x[1]}</span><span>${esc(x[2])}</span><span class="pill ${x[0]}" style="font-size:11px;padding:1px 7px;margin-left:auto">${x[0]}</span></li>`).join(""):'<li class="none">No policy or fraud rule fired.</li>';
+  $("reasons").innerHTML=r.dec==="APPROVE"?'<li class="none">Approved, so no adverse-action notice is needed.</li>':(r.reasons.length?r.reasons.map(t=>`<li><span class="code">RC-${t.f.toUpperCase().slice(0,12)}</span><span>${REASON[t.f]}</span><span style="margin-left:auto;font-family:var(--mono);color:var(--muted)">−${t.lost.toFixed(0)} pts</span></li>`).join(""):'<li class="none">Score is near the best possible; the decision comes from policy rules.</li>');
+  $("trace").innerHTML=r.trace.map(t=>{const v=typeof t.v==="number"?(t.v<5&&t.v%1?t.v.toFixed(3):fmt(t.v)):(t.v??"missing");
+    return `<tr><td>${LABEL[t.f]}</td><td style="font-family:var(--mono)">${esc(v)}</td><td style="font-family:var(--mono);color:var(--muted)">${esc(t.bin)}</td><td class="n">${t.p.toFixed(1)}</td><td><div class="bar"><i style="width:${Math.max(4,t.p/t.best*100)}%"></i></div></td></tr>`}).join("")
+   +`<tr><td colspan="3"><b>Total score</b></td><td class="n"><b>${r.sc.toFixed(1)}</b></td><td></td></tr>`;
+}
+
+function model(){
+  const t=META.metrics.champion_lr_woe.test, g=META.metrics.challenger_gbm.test;
+  $("mv").textContent=SC.model_version;
+  $("kpis").innerHTML=[["Gini",t.gini.toFixed(3),`challenger GBM ${g.gini.toFixed(3)}`],["AUC",t.auc.toFixed(3),"0.5 = coin toss"],["KS",t.ks.toFixed(3),"accept if > 0.30"],["PSI",META.metrics.psi_train_vs_test.toFixed(3),"stable if < 0.10"],["Brier",t.brier.toFixed(3),"lower is better"],["Features",META.selected_features.length,"age excluded"]]
+   .map(k=>`<div class="kpi"><span>${k[0]}</span><b>${k[1]}</b><br><small>${k[2]}</small></div>`).join("");
+  $("grades").innerHTML=GRADES.map(g=>`<tr><td><b>${g.grade}</b></td><td class="n">${SC.grades.find(x=>x[0]===g.grade)[1]}</td><td class="n">${(g.share*100).toFixed(1)}%</td><td class="n">${(g.bad_rate*100).toFixed(1)}%</td><td><div class="bar"><i style="width:${g.bad_rate/0.3*100}%;background:var(--bad)"></i></div></td></tr>`).join("");
+  const cut=()=>{const c=+$("cut").value, row=CUTS.find(x=>x.cutoff===c); $("cv").textContent=c;
+    $("cutk").innerHTML=[["Approval rate",(row.approval_rate*100).toFixed(1)+"%"],["Bad rate of approved",(row.bad_rate_approved*100).toFixed(1)+"%"],["Expected loss / book",(row.el_pct_of_book*100).toFixed(2)+"%"]].map(k=>`<div class="kpi"><span>${k[0]}</span><b>${k[1]}</b></div>`).join("")};
+  $("cut").addEventListener("input",cut); cut();
+}
+
+document.querySelectorAll("[data-p]").forEach(b=>b.addEventListener("click",()=>fill(PRESETS[b.dataset.p])));
+$("f").addEventListener("input",run); $("f").addEventListener("submit",e=>e.preventDefault());
+model(); fill(PRESETS.border);
+</script>

@@ -1,0 +1,12 @@
+# Render.com Blueprint (Step 27-28). Render reads this when you choose "New > Blueprint".
+services:
+  - type: web
+    name: ifcc-credit-risk
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: IFCC_OPS_KEY
+        generateValue: true
+      - key: IFCC_UW_KEY
+        generateValue: true

@@ -1,0 +1,16 @@
+,dtype,missing_pct,n_unique
+employment_type,str,0.0,4
+employment_years,float64,2.02,244
+home_ownership,str,0.0,3
+annual_income,float64,0.0,1689
+credit_history_years,float64,0.0,324
+num_open_accounts,int64,0.0,14
+credit_utilization,float64,3.08,950
+num_inquiries_6m,int64,0.0,9
+num_delinquencies_2y,int64,0.0,5
+existing_monthly_debt,float64,0.0,3999
+loan_purpose,str,0.0,7
+loan_amount,float64,0.0,491
+loan_term_months,int64,0.0,5
+dti,float64,0.0,1017
+loan_to_income,float64,0.0,555

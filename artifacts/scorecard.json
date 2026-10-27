@@ -1,0 +1,447 @@
+{
+  "model_version": "ifcc-pl-scorecard-v1.0.0",
+  "factor": 28.85390081777927,
+  "offset": 487.1228762045055,
+  "score_min": 300,
+  "score_max": 900,
+  "grades": [
+    [
+      "A",
+      590
+    ],
+    [
+      "B",
+      570
+    ],
+    [
+      "C",
+      550
+    ],
+    [
+      "D",
+      530
+    ],
+    [
+      "E",
+      300
+    ]
+  ],
+  "approve_cutoff": 550,
+  "refer_cutoff": 530,
+  "lgd": 0.65,
+  "policy": {
+    "min_annual_income": 12000,
+    "max_dti_decline": 0.8,
+    "max_dti_refer": 0.6,
+    "max_delinquencies_refer": 3,
+    "max_loan_amount_auto": 40000,
+    "fraud_inquiries": 6,
+    "fraud_lti": 0.5
+  },
+  "features": {
+    "employment_type": {
+      "type": "categorical",
+      "coef": -0.7687505351442068,
+      "points": {
+        "Contract": 49.26,
+        "Salaried": 59.31,
+        "Self-Employed": 56.74,
+        "Unemployed": 21.64
+      },
+      "neutral_points": 54.86
+    },
+    "employment_years": {
+      "type": "numeric",
+      "coef": -0.33125022665323606,
+      "points": {
+        "[-inf, 1.6)": 50.08,
+        "[1.6, 2.7)": 55.01,
+        "[2.7, 4)": 55.25,
+        "[4, 5.6)": 56.34,
+        "[5.6, 7.9)": 56.65,
+        "[7.9, inf)": 57.0,
+        "__MISSING__": 56.15
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 1.6)",
+          "lower": null,
+          "upper": 1.6,
+          "points": 50.08
+        },
+        {
+          "label": "[1.6, 2.7)",
+          "lower": 1.6,
+          "upper": 2.7,
+          "points": 55.01
+        },
+        {
+          "label": "[2.7, 4)",
+          "lower": 2.7,
+          "upper": 4.0,
+          "points": 55.25
+        },
+        {
+          "label": "[4, 5.6)",
+          "lower": 4.0,
+          "upper": 5.6,
+          "points": 56.34
+        },
+        {
+          "label": "[5.6, 7.9)",
+          "lower": 5.6,
+          "upper": 7.9,
+          "points": 56.65
+        },
+        {
+          "label": "[7.9, inf)",
+          "lower": 7.9,
+          "upper": null,
+          "points": 57.0
+        }
+      ],
+      "missing_points": 56.15
+    },
+    "annual_income": {
+      "type": "numeric",
+      "coef": -0.5458167782537189,
+      "points": {
+        "[-inf, 3.28e+04)": 44.95,
+        "[3.28e+04, 4.35e+04)": 53.35,
+        "[4.35e+04, 5.38e+04)": 57.37,
+        "[5.38e+04, 8.52e+04)": 58.3,
+        "[8.52e+04, inf)": 61.11
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 3.28e+04)",
+          "lower": null,
+          "upper": 32800.0,
+          "points": 44.95
+        },
+        {
+          "label": "[3.28e+04, 4.35e+04)",
+          "lower": 32800.0,
+          "upper": 43500.0,
+          "points": 53.35
+        },
+        {
+          "label": "[4.35e+04, 5.38e+04)",
+          "lower": 43500.0,
+          "upper": 53800.0,
+          "points": 57.37
+        },
+        {
+          "label": "[5.38e+04, 8.52e+04)",
+          "lower": 53800.0,
+          "upper": 85200.0,
+          "points": 58.3
+        },
+        {
+          "label": "[8.52e+04, inf)",
+          "lower": 85200.0,
+          "upper": null,
+          "points": 61.11
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "credit_history_years": {
+      "type": "numeric",
+      "coef": -1.1009949626617053,
+      "points": {
+        "[-inf, 3.6)": 43.21,
+        "[12, 16)": 57.42,
+        "[16, 20.4)": 64.71,
+        "[20.4, inf)": 71.21,
+        "[3.6, 8)": 46.2,
+        "[8, 12)": 53.0
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 3.6)",
+          "lower": null,
+          "upper": 3.6,
+          "points": 43.21
+        },
+        {
+          "label": "[3.6, 8)",
+          "lower": 3.6,
+          "upper": 8.0,
+          "points": 46.2
+        },
+        {
+          "label": "[8, 12)",
+          "lower": 8.0,
+          "upper": 12.0,
+          "points": 53.0
+        },
+        {
+          "label": "[12, 16)",
+          "lower": 12.0,
+          "upper": 16.0,
+          "points": 57.42
+        },
+        {
+          "label": "[16, 20.4)",
+          "lower": 16.0,
+          "upper": 20.4,
+          "points": 64.71
+        },
+        {
+          "label": "[20.4, inf)",
+          "lower": 20.4,
+          "upper": null,
+          "points": 71.21
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "credit_utilization": {
+      "type": "numeric",
+      "coef": -1.1102837120144504,
+      "points": {
+        "[-inf, 0.188)": 73.17,
+        "[0.188, 0.381)": 62.83,
+        "[0.381, 0.481)": 54.21,
+        "[0.481, 0.607)": 46.65,
+        "[0.607, inf)": 38.16,
+        "__MISSING__": 62.11
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 0.188)",
+          "lower": null,
+          "upper": 0.188,
+          "points": 73.17
+        },
+        {
+          "label": "[0.188, 0.381)",
+          "lower": 0.188,
+          "upper": 0.381,
+          "points": 62.83
+        },
+        {
+          "label": "[0.381, 0.481)",
+          "lower": 0.381,
+          "upper": 0.481,
+          "points": 54.21
+        },
+        {
+          "label": "[0.481, 0.607)",
+          "lower": 0.481,
+          "upper": 0.607,
+          "points": 46.65
+        },
+        {
+          "label": "[0.607, inf)",
+          "lower": 0.607,
+          "upper": null,
+          "points": 38.16
+        }
+      ],
+      "missing_points": 62.11
+    },
+    "num_inquiries_6m": {
+      "type": "numeric",
+      "coef": -1.1321315234194496,
+      "points": {
+        "[-inf, 1)": 62.23,
+        "[1, 2)": 57.02,
+        "[2, inf)": 47.0
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 1)",
+          "lower": null,
+          "upper": 1.0,
+          "points": 62.23
+        },
+        {
+          "label": "[1, 2)",
+          "lower": 1.0,
+          "upper": 2.0,
+          "points": 57.02
+        },
+        {
+          "label": "[2, inf)",
+          "lower": 2.0,
+          "upper": null,
+          "points": 47.0
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "num_delinquencies_2y": {
+      "type": "numeric",
+      "coef": -1.068446810655401,
+      "points": {
+        "[-inf, 1)": 61.11,
+        "[1, inf)": 42.91
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 1)",
+          "lower": null,
+          "upper": 1.0,
+          "points": 61.11
+        },
+        {
+          "label": "[1, inf)",
+          "lower": 1.0,
+          "upper": null,
+          "points": 42.91
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "loan_term_months": {
+      "type": "numeric",
+      "coef": -0.07495764684903747,
+      "points": {
+        "[-inf, 24)": 54.04,
+        "[24, 36)": 54.8,
+        "[36, 48)": 54.94,
+        "[48, inf)": 55.08
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 24)",
+          "lower": null,
+          "upper": 24.0,
+          "points": 54.04
+        },
+        {
+          "label": "[24, 36)",
+          "lower": 24.0,
+          "upper": 36.0,
+          "points": 54.8
+        },
+        {
+          "label": "[36, 48)",
+          "lower": 36.0,
+          "upper": 48.0,
+          "points": 54.94
+        },
+        {
+          "label": "[48, inf)",
+          "lower": 48.0,
+          "upper": null,
+          "points": 55.08
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "dti": {
+      "type": "numeric",
+      "coef": -0.977945032960191,
+      "points": {
+        "[-inf, 0.229)": 73.25,
+        "[0.229, 0.305)": 65.33,
+        "[0.305, 0.377)": 60.66,
+        "[0.377, 0.457)": 57.01,
+        "[0.457, 0.572)": 48.82,
+        "[0.572, inf)": 36.31
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 0.229)",
+          "lower": null,
+          "upper": 0.229,
+          "points": 73.25
+        },
+        {
+          "label": "[0.229, 0.305)",
+          "lower": 0.229,
+          "upper": 0.305,
+          "points": 65.33
+        },
+        {
+          "label": "[0.305, 0.377)",
+          "lower": 0.305,
+          "upper": 0.377,
+          "points": 60.66
+        },
+        {
+          "label": "[0.377, 0.457)",
+          "lower": 0.377,
+          "upper": 0.457,
+          "points": 57.01
+        },
+        {
+          "label": "[0.457, 0.572)",
+          "lower": 0.457,
+          "upper": 0.572,
+          "points": 48.82
+        },
+        {
+          "label": "[0.572, inf)",
+          "lower": 0.572,
+          "upper": null,
+          "points": 36.31
+        }
+      ],
+      "missing_points": 54.86
+    },
+    "loan_to_income": {
+      "type": "numeric",
+      "coef": -0.5104186205612955,
+      "points": {
+        "[-inf, 0.142)": 60.4,
+        "[0.142, 0.232)": 58.22,
+        "[0.232, 0.321)": 57.68,
+        "[0.321, 0.408)": 55.01,
+        "[0.408, 0.499)": 51.3,
+        "[0.499, inf)": 49.18
+      },
+      "neutral_points": 54.86,
+      "bins": [
+        {
+          "label": "[-inf, 0.142)",
+          "lower": null,
+          "upper": 0.142,
+          "points": 60.4
+        },
+        {
+          "label": "[0.142, 0.232)",
+          "lower": 0.142,
+          "upper": 0.232,
+          "points": 58.22
+        },
+        {
+          "label": "[0.232, 0.321)",
+          "lower": 0.232,
+          "upper": 0.321,
+          "points": 57.68
+        },
+        {
+          "label": "[0.321, 0.408)",
+          "lower": 0.321,
+          "upper": 0.408,
+          "points": 55.01
+        },
+        {
+          "label": "[0.408, 0.499)",
+          "lower": 0.408,
+          "upper": 0.499,
+          "points": 51.3
+        },
+        {
+          "label": "[0.499, inf)",
+          "lower": 0.499,
+          "upper": null,
+          "points": 49.18
+        }
+      ],
+      "missing_points": 54.86
+    }
+  }
+}

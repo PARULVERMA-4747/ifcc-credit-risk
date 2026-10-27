@@ -1,0 +1,16 @@
+,iv,strength
+dti,0.1833,medium
+employment_type,0.1818,medium
+credit_utilization,0.127,medium
+annual_income,0.1258,medium
+credit_history_years,0.0918,weak
+num_delinquencies_2y,0.078,weak
+loan_to_income,0.0736,weak
+employment_years,0.0664,weak
+num_inquiries_6m,0.0367,weak
+loan_term_months,0.0203,weak
+loan_purpose,0.0099,useless
+home_ownership,0.0092,useless
+loan_amount,0.0052,useless
+existing_monthly_debt,0.002,useless
+num_open_accounts,0.0001,useless

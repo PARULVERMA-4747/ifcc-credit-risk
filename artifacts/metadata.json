@@ -1,0 +1,63 @@
+{
+  "model_version": "ifcc-pl-scorecard-v1.0.0",
+  "trained_at_utc": "2026-10-27T08:38:38.831061+00:00",
+  "data_sha256_16": "5853f88814c9530e",
+  "seed": 42,
+  "n_train": 17500,
+  "n_test": 7500,
+  "selected_features": [
+    "employment_type",
+    "employment_years",
+    "annual_income",
+    "credit_history_years",
+    "credit_utilization",
+    "num_inquiries_6m",
+    "num_delinquencies_2y",
+    "loan_term_months",
+    "dti",
+    "loan_to_income"
+  ],
+  "excluded_features": [
+    "age"
+  ],
+  "scaling": {
+    "pdo": 20,
+    "base_score": 600,
+    "base_odds": 50,
+    "factor": 28.85390081777927,
+    "offset": 487.1228762045055
+  },
+  "metrics": {
+    "champion_lr_woe": {
+      "train": {
+        "auc": 0.7393,
+        "gini": 0.4787,
+        "ks": 0.3582,
+        "log_loss": 0.3003,
+        "brier": 0.086
+      },
+      "test": {
+        "auc": 0.7429,
+        "gini": 0.4858,
+        "ks": 0.3639,
+        "log_loss": 0.3008,
+        "brier": 0.0867
+      }
+    },
+    "challenger_gbm": {
+      "test": {
+        "auc": 0.7302,
+        "gini": 0.4604,
+        "ks": 0.3538,
+        "log_loss": 0.3029,
+        "brier": 0.0865
+      }
+    },
+    "psi_train_vs_test": 0.0028,
+    "portfolio_test": {
+      "total_ead": 140425900.0,
+      "total_el": 9642356.0,
+      "el_rate": 0.0687
+    }
+  }
+}
